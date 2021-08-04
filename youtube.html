@@ -1,0 +1,128 @@
+<!-- https://youtube.googleapis.com/youtube/v3/search?key=[YOUR_API_KEY] HTTP/1.1 -->
+<!-- <image src='https://cdn.icon-icons.com/icons2/2551/PNG/512/search_icon_152764.png'></image> -->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        #navbar {
+            border: black 1px solid;
+            padding: 1%;
+            background-color: rgb(61, 61, 61);
+            position: relative;
+        }
+
+        #inp {
+            width: 30%;
+            height: 30px;
+            background-color: black;
+            border: none;
+            font-size: 1.3rem;
+            font-family: Arial, Helvetica, sans-serif;
+            color: gray;
+            margin-left: 25%;
+        }
+
+        #btn {
+            position: absolute;
+            height: 30px;
+            background-color: rgb(129, 129, 129);
+            border: none;
+            width: 5%;
+            cursor: pointer;
+        }
+
+        #logo {
+            position: absolute;
+            width: 2%;
+            height: 20px;
+            left: 57%;
+            top: 20px;
+            cursor: pointer;
+        }
+
+        #display {
+            display: grid;
+            grid-template-columns: repeat(4, 23%);
+            padding: 2%;
+            grid-row-gap: 30px;
+            grid-column-gap: 30px;
+            /* border: 1px solid red; */
+            background-color: rgb(26, 26, 26);
+            width: 85%;
+        }
+
+        #option {
+            width: 15%;
+            background-color: rgb(61, 61, 61);
+        }
+
+        #display>div>iframe {
+            width: 100%;
+            height: 250px;
+        }
+
+        #box {
+            display: flex;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="navbar">
+        <input type="text" id="inp" placeholder="Search">
+        <button id="btn" onclick="makerequest()"></button>
+        <image id="logo" onclick="makerequest()"
+            src='https://cdn.icon-icons.com/icons2/2551/PNG/512/search_icon_152764.png'></image>
+    </div>
+    <div id="box">
+        <div id="option"></div>
+        <div id="display"></div>
+    </div>
+</body>
+
+</html>
+<script>
+    let div_dis = document.getElementById("display");
+    async function makerequest() {
+        div_dis.innerHTML = null;
+        let q = document.getElementById('inp').value;
+        let res = await fetch(`https://www.googleapis.com/youtube/v3/search?q=${q}&key=AIzaSyB-0eG45BV6vNysPiycQxenC6HJOihZGys&maxResults=20`)
+        let data = await res.json();
+        //console.log(data)
+        let { items } = data;
+
+        items = items.filter(function (el) {
+            return el.id.videoId != undefined
+        })
+
+        items.forEach(({ id: { videoId } }) => {
+
+            let div = document.createElement('div');
+            div.innerHTML = `<iframe width="560" height="315" src="https://www.youtube.com/embed/${videoId}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`
+            div_dis.append(div);
+
+        });
+    }
+
+    async function popular() {
+        let res = await fetch(`https://youtube.googleapis.com/youtube/v3/videos?part=snippet%2CcontentDetails%2Cstatistics&chart=mostPopular&regionCode=IN&key=AIzaSyB-0eG45BV6vNysPiycQxenC6HJOihZGys&maxResults=20`)
+        let data = await res.json();
+        //console.log(data);
+        let { items } = data;
+        //console.log(items)
+
+        items = items.filter(function (el) {
+            return el.id != undefined
+        })
+
+        items.forEach(({ id, snippet: { title } }) => {
+            let div = document.createElement('div');
+            div.innerHTML = `<iframe width="560" height="315" src="https://www.youtube.com/embed/${id}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`
+            div_dis.append(div);
+            console.log(title)
+        });
+    }
+    popular()
+
+</script>
